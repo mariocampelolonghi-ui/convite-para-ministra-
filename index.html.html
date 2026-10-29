@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#171126">
+<title>Missão Secreta 👀</title>
+<style>
+:root{--bg:#171126;--card:#241a38;--pink:#ff78ad;--lav:#c7b5ff;--text:#fff8ff;--muted:#d9cfe8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100svh;background:radial-gradient(circle at 15% 10%,#47305f 0,transparent 35%),radial-gradient(circle at 90% 90%,#4b214a 0,transparent 35%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif;display:grid;place-items:center;padding:18px}
+.card{width:min(100%,440px);background:rgba(36,26,56,.92);border:1px solid #ffffff20;border-radius:26px;padding:28px 22px;text-align:center;box-shadow:0 20px 70px #0005;position:relative;overflow:hidden}
+.badge{display:inline-block;border:1px solid #ffffff28;color:var(--lav);border-radius:99px;padding:7px 12px;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase}
+h1{font-size:clamp(1.8rem,7vw,2.4rem);line-height:1.08;margin:18px 0 12px}
+p{color:var(--muted);line-height:1.55;margin:10px 0 20px}
+.emoji{font-size:3.2rem;display:block;margin:12px 0}
+button{font:inherit;font-weight:750;border:0;border-radius:14px;padding:14px 16px;cursor:pointer;transition:transform .15s,filter .15s;width:100%;margin:6px 0}
+button:active{transform:scale(.98)}
+.primary{background:linear-gradient(135deg,var(--pink),#ffb1cf);color:#35142a}
+.secondary{background:#ffffff12;border:1px solid #ffffff24;color:var(--text)}
+.options{display:grid;gap:5px}
+.small{font-size:.82rem;color:#b7a9ca;margin-top:18px}
+.progress{height:5px;background:#ffffff16;border-radius:99px;overflow:hidden;margin:20px 0 8px}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--lav));transition:width .3s}
+.hidden{display:none!important}
+#toast{min-height:26px;color:var(--pink);font-weight:700;font-size:.92rem}
+.heart{position:fixed;bottom:-30px;animation:float 4s linear forwards;pointer-events:none}
+@keyframes float{to{transform:translateY(-110vh) rotate(25deg);opacity:0}}
+.spinner{width:42px;height:42px;border:4px solid #ffffff25;border-top-color:var(--pink);border-radius:50%;animation:spin .8s linear infinite;margin:18px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+#noBtn{position:relative}
+</style>
+</head>
+<body>
+<main class="card">
+  <section id="screen-start">
+    <span class="badge">Departamento de assuntos suspeitos</span>
+    <span class="emoji">🕵️‍♀️</span>
+    <h1>Você foi convocada.</h1>
+    <p>Uma missão ultrassecreta chegou até você. O nível de seriedade é questionável, mas sua participação é muito importante. 👀</p>
+    <button class="primary" onclick="startMission()">Aceito a missão 😎</button>
+    <button class="secondary" onclick="startJoke()">Não tenho tempo pra isso 🙄</button>
+    <div class="small">Aviso: este site pode causar risadinhas involuntárias.</div>
+  </section>
+
+  <section id="screen-quiz" class="hidden">
+    <span class="badge" id="stage">Missão 1 de 3</span>
+    <span class="emoji" id="qEmoji">🤔</span>
+    <h1 id="qTitle">Pergunta importante</h1>
+    <p id="qText"></p>
+    <div class="options" id="answers"></div>
+    <div id="toast" aria-live="polite"></div>
+    <div class="progress"><span id="bar"></span></div>
+    <div class="small">Responda com sinceridade… ou pelo menos com criatividade.</div>
+  </section>
+
+  <section id="screen-loading" class="hidden">
+    <span class="badge">Analisando resultados</span>
+    <span class="emoji">🧪</span>
+    <h1>Processando evidências…</h1>
+    <p id="loadingText">Verificando nível de charme, senso de humor e capacidade de tolerar certas pessoas.</p>
+    <div class="spinner"></div>
+  </section>
+
+  <section id="screen-final" class="hidden">
+    <span class="badge">Relatório confidencial</span>
+    <span class="emoji">🏆</span>
+    <h1>Missão concluída!</h1>
+    <p>Após uma análise extremamente científica (feita por uma equipe de uma pessoa só), chegamos a uma conclusão:</p>
+    <h2 style="color:var(--pink)">Você ganhou um convite especial. ❤️</h2>
+    <p>Que tal sair comigo e deixar eu tentar te fazer sorrir ao vivo? Prometo boas risadas, algumas provocações e, quem sabe, uma sobremesa. 😏</p>
+    <button class="primary" onclick="yesInvite()">Aceito esse plano 👀</button>
+    <button class="secondary" onclick="maybeInvite()">Preciso analisar a proposta 🤔</button>
+    <div id="finalToast" class="small" aria-live="polite"></div>
+  </section>
+
+  <section id="screen-yes" class="hidden">
+    <span class="emoji">🥳💗✨</span>
+    <h1>Temos um acordo!</h1>
+    <p>Agora só falta combinar o dia e o lugar. A organização da missão entrará em contato… quer dizer, eu mesmo vou falar com você 😂❤️</p>
+    <button class="primary" onclick="celebrate()">Comemorar novamente 🎉</button>
+  </section>
+</main>
+<script>
+let step = 0;
+const questions = [
+ {emoji:"🧐",title:"Pergunta nº 1",text:"Qual é a sua principal habilidade secreta?",answers:[
+  ["Fazer charme sem perceber 😌","Resposta suspeitamente convincente."],
+  ["Rir de coisas sem sentido 😂","Competência essencial para esta missão."],
+  ["Fingir que não está curiosa 👀","A equipe detectou curiosidade em níveis elevados."]
+ ]},
+ {emoji:"😏",title:"Pergunta nº 2",text:"Se eu te chamar para um programa surpresa, você…",answers:[
+  ["Pergunta todos os detalhes primeiro 🕵️","Investigadora profissional. Respeitamos."],
+  ["Vai e descobre na hora ✨","Coragem detectada. Gostamos disso."],
+  ["Pergunta se vai ter comida 🍟","Prioridades impecáveis."]
+ ]},
+ {emoji:"🤝",title:"Pergunta nº 3",text:"Qual deve ser a recompensa por concluir esta missão?",answers:[
+  ["Uma sobremesa, obviamente 🍰","A resposta mais sensata até agora."],
+  ["Um encontro divertido 😎","Anotado no relatório confidencial."],
+  ["Os dois. Não sou boba 😂","Negociação de alto nível."]
+ ]}
+];
+function show(id){document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden')}
+function startMission(){step=0;show('screen-quiz');renderQuestion()}
+function startJoke(){show('screen-quiz');step=0;document.getElementById('stage').textContent='Flagra detectado';document.getElementById('qEmoji').textContent='🚨';document.getElementById('qTitle').textContent='Tentativa de fuga registrada';document.getElementById('qText').textContent='Tudo bem, você pode tentar escapar… mas a curiosidade provavelmente vai vencer. 😂';document.getElementById('answers').innerHTML='<button class="primary" onclick="startMission()">Tá bom, quero ver 😅</button><button class="secondary" onclick="startMission()">Ok, fui convencida 👀</button>';document.getElementById('toast').textContent=''}
+function renderQuestion(){const q=questions[step];document.getElementById('stage').textContent=`Missão ${step+1} de ${questions.length}`;document.getElementById('qEmoji').textContent=q.emoji;document.getElementById('qTitle').textContent=q.title;document.getElementById('qText').textContent=q.text;document.getElementById('bar').style.width=(step/questions.length*100)+'%';document.getElementById('toast').textContent='';document.getElementById('answers').innerHTML='';q.answers.forEach(([label,reply])=>{const b=document.createElement('button');b.className='secondary';b.textContent=label;b.onclick=()=>answer(reply);document.getElementById('answers').appendChild(b)})}
+function answer(reply){document.getElementById('toast').textContent=reply;[...document.querySelectorAll('#answers button')].forEach(b=>b.disabled=true);setTimeout(()=>{step++;if(step<questions.length)renderQuestion();else finish()},1000)}
+function finish(){show('screen-loading');document.getElementById('bar').style.width='100%';setTimeout(()=>show('screen-final'),2300)}
+function yesInvite(){show('screen-yes');celebrate()}
+function maybeInvite(){document.getElementById('finalToast').textContent='Proposta enviada para análise. Aceitamos resposta acompanhada de sobremesa. 😂'}
+function celebrate(){for(let i=0;i<24;i++){setTimeout(()=>{const h=document.createElement('div');h.className='heart';h.textContent=['💗','✨','💖','💕','🎉'][Math.floor(Math.random()*5)];h.style.left=Math.random()*100+'vw';h.style.fontSize=(18+Math.random()*22)+'px';document.body.appendChild(h);setTimeout(()=>h.remove(),4100)},i*70)}}
+</script>
+</body>
+</html>
